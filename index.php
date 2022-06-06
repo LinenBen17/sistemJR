@@ -31,20 +31,35 @@
 	        	$assoc = $result->fetch_assoc();
 
 	        	$password_bd = $assoc['password'];
-	        	$pass_c = password_hash($password, PASSWORD_DEFAULT);
+	        	$pass_c = password_hash("ass", PASSWORD_DEFAULT);
 
-
-	        	/*if (password_verify($password, $password_bd)) {
+	        	if (password_verify($password, $password_bd)) {
 	        		$_SESSION['id'] = $assoc['id'];
 	        		$_SESSION['nombre'] = $assoc['nombre'];
 	        		$_SESSION['tipo_usuario'] = $assoc['tipo_usuario'];
 
 	        		header("location: principal.php");
 	        	}else{
-	        		echo "La contraseña no coincide";
-	        	}*/
+?>
+					<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	        		<script type="text/javascript">
+	        			$(document).ready(function(){
+							var contenedorErrorPass = document.querySelector(".errorPassword");
+	        				contenedorErrorPass	.style.display = "block";
+	        			})
+	        		</script>
+<?php
+	        	}
 	        }else{
-	            echo "NO existe el usuario";
+?>
+				<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+				<script type="text/javascript">
+					$(document).ready(function(){
+						var contenedorErrorUser = document.querySelector(".errorUser");
+	        			contenedorErrorUser.style.display = "block";
+	        		})
+				</script>
+<?php
 	        }
         }	
     }
@@ -55,6 +70,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="css/index.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<title>Login</title>
 </head>
 <body>
@@ -70,6 +86,12 @@
 					<div class="inputBx">
 						<input type="password" name="password" placeholder="Contraseña" autocomplete="nope">
 						<ion-icon name="lock-closed-outline"></ion-icon>
+					</div>
+					<div class="errorPassword">
+						<p>¡Contraseña Incorrecta! Inténtalo de nuevo.</p>
+					</div>
+					<div class="errorUser">
+						<p>¡Usuario invalido o inexistente! Inténtalo de nuevo.</p>
 					</div>
 					<div class="inputBx">
 						<input type="submit" value="Login">

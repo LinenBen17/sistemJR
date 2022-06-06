@@ -53,6 +53,19 @@ section {
 	width: 100%;
 	margin-bottom: 20px;
 }
+.box .form .errorPassword,
+.box .form .errorUser{
+	background: #f14141;
+	margin-bottom: 10px;
+	display: none;
+	border-radius: 6px;
+	box-shadow: inset 0px 0px 8px 0px #ff0000;
+}
+.box .form .errorPassword p,
+.box .form .errorUser p{
+	text-align: center;
+	color: #FFF;
+}
 .box .form .inputBx input::placeholder{
 	color: #fff;
 }
@@ -70,8 +83,9 @@ section {
 	box-shadow: inset 0 0 25px rgba(0, 0, 0, .2);
 }
 .box .form .inputBx input[type="submit"]{
-	background: #fff;
-	color: #111;
+	background: #F00;
+	border: none;
+	color: #FFF;
 	max-width: 100px;
 	padding: 8px 10px;
 	box-shadow: none;
@@ -86,4 +100,3 @@ section {
 	transform: scale(1.5);
 	filter: invert(1);
 }
-.bo
