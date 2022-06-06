@@ -7,35 +7,46 @@
     session_start();
 
     if ($_POST) {
-        $usuario = $_POST['usuario'];
-        $password = $_POST['password'];
+        $usuario = filter_var($_POST['usuario'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $password = filter_var($_POST['password'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-        $sql = $mysqli->prepare("SELECT id, password, nombre, tipo_usuario FROM usuarios WHERE usuario = ?");
-        $sql->bind_param("i", $usuario, $password);
-        $resultado = $mysqli->query($sql);
-        
+        $sql = "SELECT id, password, nombre, tipo_usuario FROM usuarios WHERE usuario = ?";
 
-        /*$resultado = $mysqli->query($sql);
-        $num = $resultado->num_rows;
+        if ($sentencia_inicial = $mysqli->prepare($sql)) {
 
-        if ($num>0) {
-            $row = $resultado->fetch_assoc();
-            $password_bd = $row['password'];
+	        $sentencia_inicial->bind_param("s", $usuario);
+	        $sentencia_inicial->execute();
+	        $sentencia_inicial->store_result();
 
-            $pass_c = sha1($password);
+	        $num_rows = $sentencia_inicial->num_rows;
 
-            if ($password_bd == $pass_c) {
-                $_SESSION['id'] = $row['id'];
-                $_SESSION['nombre'] = $row['nombre'];
-                $_SESSION['tipo_usuario'] = $row['tipo_usuario'];
+			if ($num_rows > 0) {
+	            $sentencia_inicial->close();
 
-                header("location: principal.php");
-            }else{
-                echo "La contraseña no coincide";
-            }
-        }else{
-            echo "NO existe el usuario";
-        }*/
+	            $sentencia_fetch = $mysqli->prepare($sql);
+	        	$sentencia_fetch->bind_param("s", $usuario);
+	        	$sentencia_fetch->execute();
+
+	        	$result = $sentencia_fetch->get_result();
+	        	$assoc = $result->fetch_assoc();
+
+	        	$password_bd = $assoc['password'];
+	        	$pass_c = password_hash($password, PASSWORD_DEFAULT);
+
+
+	        	/*if (password_verify($password, $password_bd)) {
+	        		$_SESSION['id'] = $assoc['id'];
+	        		$_SESSION['nombre'] = $assoc['nombre'];
+	        		$_SESSION['tipo_usuario'] = $assoc['tipo_usuario'];
+
+	        		header("location: principal.php");
+	        	}else{
+	        		echo "La contraseña no coincide";
+	        	}*/
+	        }else{
+	            echo "NO existe el usuario";
+	        }
+        }	
     }
 ?>
 <!DOCTYPE html>
