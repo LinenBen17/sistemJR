@@ -1,6 +1,8 @@
 <?php 
-    ini_set('display_errors', 1);
+    ini_set('display_errors', 0);
     error_reporting(E_ALL);
+
+    require 'conexion.php';
 
     session_start();
 
@@ -10,7 +12,6 @@
 
     $nombre = $_SESSION['nombre'];
     $tipo_usuario = $_SESSION['tipo_usuario'];
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -73,87 +74,113 @@
 			<div class="details">
 				<div class="recentOrders">
 					<div class="cardHeader">
-						<h2>Recent Orders</h2>
-						<a href="#" class="btn">View All</a>
+						<h2>Tracking Guía</h2>
+					</div>
+					<div class="inputBx">
+						<form method="POST">
+							<label>Introduce el número de guía:</label><br>
+							<input type="text" name="noguia">
+							<input type="submit" class="btn" value="Consultar">
+						</form>
+						<?php
+						    if ($_POST) {
+						    	$noguia = $_POST['noguia'];
+
+						    	$sql_descarga_camiones = "SELECT escaneo, fecha, responsabl, manifiesto, rutaingres FROM descargacamiones WHERE escaneo = ?";
+						    	$sql_carga_camiones = "SELECT escaneo, fecha, responsabl, manifiesto, rutadestin FROM cargacamiones WHERE escaneo = ?";
+
+						    	if ($sentencia_rows_descarga = $mysqli->prepare($sql_descarga_camiones) and $sentencia_rows_carga = $mysqli->prepare($sql_carga_camiones)) {
+						    		$sentencia_rows_descarga->bind_param("s", $noguia);
+						    		$sentencia_rows_descarga->execute();
+						    		$sentencia_rows_descarga->store_result();
+
+						    		$sentencia_rows_carga->bind_param("s", $noguia);
+						    		$sentencia_rows_carga->execute();
+						    		$sentencia_rows_carga->store_result();
+
+						    		$num_rows_descarga = $sentencia_rows_descarga->num_rows;
+						    		$num_rows_carga = $sentencia_rows_carga->num_rows;
+
+						    		if ($num_rows_descarga > 0 or $num_rows_carga > 0) {
+						    			$sentencia_rows_descarga->close();
+						    			$sentencia_rows_carga->close();
+
+						    			$sentencia_assoc_descarga = $mysqli->prepare($sql_descarga_camiones);
+						    			$sentencia_assoc_descarga->bind_param("s", $noguia);
+						    			$sentencia_assoc_descarga->execute();
+
+						    			$result_descarga = $sentencia_assoc_descarga->get_result();
+						    			$assoc_descarga = $result_descarga->fetch_assoc();
+
+						    			$sentencia_assoc_descarga->close();
+
+						    			$sentencia_assoc_carga = $mysqli->prepare($sql_carga_camiones);
+						    			$sentencia_assoc_carga->bind_param("s", $noguia);
+						    			$sentencia_assoc_carga->execute();
+
+						    			$result_carga = $sentencia_assoc_carga->get_result();
+						    			$assoc_carga = $result_carga->fetch_assoc();
+
+						    			$sentencia_assoc_carga->close();
+						?>
+					</div>
+					<div class="cardHeader">
+						<h2>Descarga Camiones</h2>
 					</div>
 					<table>
 						<thead>
 							<tr>
-								<td>Name</td>
-								<td>Price</td>
-								<td>Payment</td>
-								<td>Status</td>
+								<td>No. Guía</td>
+								<td>Fecha</td>
+								<td>Manifiesto</td>
+								<td>Ruta Ingreso</td>
+								<td>Responsable</td>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status delivered">Delivered</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status return">Return</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status inprogress">In Progress</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status delivered">Delivered</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status return">Return</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status inprogress">In Progress</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status return">Return</span></td>
-							</tr>
-							<tr>
-								<td>Star Refrigerator</td>
-								<td>$1200</td>
-								<td>Paid</td>
-								<td><span class="status pending">Pending</span></td>
+								<td><?php if($assoc_descarga['escaneo'] != NULL){ echo $assoc_descarga['escaneo']; } ?></td>
+								<td><?php if($assoc_descarga['fecha'] != NULL){ echo $assoc_descarga['fecha']; } ?></td>
+								<td><?php if($assoc_descarga['manifiesto'] != NULL){ echo $assoc_descarga['manifiesto']; } ?></td>
+								<td><?php if($assoc_descarga['rutaingres'] != NULL){ echo $assoc_descarga['rutaingres']; } ?></td>
+								<td><?php if($assoc_descarga['responsabl'] != NULL){ echo $assoc_descarga['responsabl']; } ?></td>
 							</tr>
 						</tbody>
 					</table>
+					<div class="cardHeader">
+						<h2>Carga Camiones</h2>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<td>No. Guía</td>
+								<td>Fecha</td>
+								<td>Manifiesto</td>
+								<td>Ruta Ingreso</td>
+								<td>Responsable</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><?php if($assoc_carga['escaneo'] != NULL){ echo $assoc_carga['escaneo']; } ?></td>
+								<td><?php if($assoc_carga['fecha'] != NULL){ echo $assoc_carga['fecha']; } ?></td>
+								<td><?php if($assoc_carga['manifiesto'] != NULL){ echo $assoc_carga['manifiesto']; } ?></td>
+								<td><?php if($assoc_carga['rutadestin'] != NULL){ echo $assoc_carga['rutadestin']; } ?></td>
+								<td><?php if($assoc_carga['responsabl'] != NULL){ echo $assoc_carga['responsabl']; } ?></td>
+							</tr>
+						</tbody>
+					</table>
+					<?php
+									}else{
+					?>
+										<div class="errorGuia">
+											<span class="status pending">No se encontraron resultados con ese número de guía.</span>
+										</div>
+					<?php
+							    		}
+							    	}
+							    }
+					?>
 				</div>
 			</div>
 		</div>

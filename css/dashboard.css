@@ -167,6 +167,23 @@ body{
 	left: 10px;
 	font-size: 1.2em;
 }
+.inputBx{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+.inputBx input{
+	margin-top: 5px;
+	padding: 10px;
+	font-size: 18px;
+	outline: none;
+	border-radius: 6px;
+	border: solid 1px #111;
+	height: 30px;
+}
+.inputBx input[type="submit"]{
+	padding: 0 10px;
+	cursor: pointer;
+}
 .user{
 	position: relative;
 	overflow: hidden;
@@ -233,7 +250,7 @@ body{
 .details .recentOrders{
 	position: relative;
 	display: grid;
-	min-height: 500px;
+	min-height: 225px;
 	background-color: var(--white);
 	padding: 20px;
 	box-shadow: 0 7px 25px rgba(0, 0, 0, .2);
@@ -286,6 +303,13 @@ body{
 }
 .details .recentOrders table tr td:nth-child(3){
 	text-align: center;
+}
+.errorGuia{
+	margin-top: 15px;
+}
+.errorGuia .status.pending{
+	padding: 5px;
+	font-size: 16px;
 }
 .status.delivered{
 	padding: 2px 4px;

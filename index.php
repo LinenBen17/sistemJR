@@ -33,6 +33,8 @@
 	        	$password_bd = $assoc['password'];
 	        	$pass_c = password_hash("ass", PASSWORD_DEFAULT);
 
+	        	$sentencia_fetch->close();
+
 	        	if (password_verify($password, $password_bd)) {
 	        		$_SESSION['id'] = $assoc['id'];
 	        		$_SESSION['nombre'] = $assoc['nombre'];
