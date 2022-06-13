@@ -1,2 +1,5 @@
 # sistemJR
-Dashboard para realizar consultas SQL de números de guía entrada y salida, también para llevar control de usuarios y CRUD.
+
+Sistema de control de usuarios. Creación, Lectura, Actualizaciones y Eliminaciones (CRUD), con login y registro de usuarios para la empresa "Transportes JR".
+
+Código hecho con HTML5, CSS3, JS Y PHP puro.
