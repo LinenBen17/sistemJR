@@ -41,6 +41,17 @@ section {
 	position: relative;
 	width: 100%;
 }
+.box .form p{
+	position: relative;
+	display: inline-block;
+	color: #fff;
+	font-weight: 300;
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+.box .form a{
+	color: #FFF;
+}
 .box .form h2{
 	color: #fff;
 	font-weight: 600;

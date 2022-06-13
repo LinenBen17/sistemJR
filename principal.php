@@ -32,16 +32,22 @@
 					</a>
 				</li>
 				<li>
-					<a href="#">
+					<a href="principal.php">
 						<span class="icon"><ion-icon name="home-outline"></ion-icon></span>
 						<span class="title">Inicio</span>
 					</a>
 				</li>
 				<?php if ($tipo_usuario == 1) {?>
 					<li>
-						<a href="#">
+						<a href="controlUsuarios.php">
 							<span class="icon"><ion-icon name="people-outline"></ion-icon></span>
 							<span class="title">Control Usuarios</span>
+						</a>
+					</li>
+					<li>
+						<a href="crearUsuarios.php">
+							<span class="icon"><ion-icon name="person-add-outline"></ion-icon></span>
+							<span class="title">Crear Usuarios</span>
 						</a>
 					</li>
 				<?php } ?>
@@ -68,7 +74,7 @@
 				</div>
 				<!-- userImg -->
 				<div class="user">
-					<span><?php echo $nombre; ?></span><ion-icon name="person-circle-outline"></ion-icon>
+					<span><?php echo htmlspecialchars($nombre); ?></span><ion-icon name="person-circle-outline"></ion-icon>
 				</div>
 			</div>
 			<div class="details">
@@ -88,8 +94,9 @@
 
 						    	$sql_descarga_camiones = "SELECT escaneo, fecha, responsabl, manifiesto, rutaingres FROM descargacamiones WHERE escaneo = ?";
 						    	$sql_carga_camiones = "SELECT escaneo, fecha, responsabl, manifiesto, rutadestin FROM cargacamiones WHERE escaneo = ?";
+						    	$sql_envios = "SELECT no_guia, fecha, responsabl, manifiesto, destino, rutaingres, fecharecib, fechapago FROM envios WHERE no_guia = ?";
 
-						    	if ($sentencia_rows_descarga = $mysqli->prepare($sql_descarga_camiones) and $sentencia_rows_carga = $mysqli->prepare($sql_carga_camiones)) {
+						    	if ($sentencia_rows_descarga = $mysqli->prepare($sql_descarga_camiones) and $sentencia_rows_carga = $mysqli->prepare($sql_carga_camiones) and $sentencia_rows_envios = $mysqli->prepare($sql_envios)) {
 						    		$sentencia_rows_descarga->bind_param("s", $noguia);
 						    		$sentencia_rows_descarga->execute();
 						    		$sentencia_rows_descarga->store_result();
@@ -98,12 +105,18 @@
 						    		$sentencia_rows_carga->execute();
 						    		$sentencia_rows_carga->store_result();
 
+						    		$sentencia_rows_envios->bind_param("s", $noguia);
+						    		$sentencia_rows_envios->execute();
+						    		$sentencia_rows_envios->store_result();
+
 						    		$num_rows_descarga = $sentencia_rows_descarga->num_rows;
 						    		$num_rows_carga = $sentencia_rows_carga->num_rows;
+						    		$num_rows_envios = $sentencia_rows_envios->num_rows;
 
-						    		if ($num_rows_descarga > 0 or $num_rows_carga > 0) {
+						    		if ($num_rows_descarga > 0 or $num_rows_carga > 0 or $num_rows_envios > 0) {
 						    			$sentencia_rows_descarga->close();
 						    			$sentencia_rows_carga->close();
+						    			$sentencia_rows_envios->close();
 
 						    			$sentencia_assoc_descarga = $mysqli->prepare($sql_descarga_camiones);
 						    			$sentencia_assoc_descarga->bind_param("s", $noguia);
@@ -122,10 +135,19 @@
 						    			$assoc_carga = $result_carga->fetch_assoc();
 
 						    			$sentencia_assoc_carga->close();
+
+										$sentencia_assoc_envios = $mysqli->prepare($sql_envios);
+						    			$sentencia_assoc_envios->bind_param("s", $noguia);
+						    			$sentencia_assoc_envios->execute();
+
+						    			$result_envios = $sentencia_assoc_envios->get_result();
+						    			$assoc_envios = $result_envios->fetch_assoc();
+
+						    			$sentencia_assoc_envios->close();
 						?>
 					</div>
 					<div class="cardHeader">
-						<h2>Descarga Camiones</h2>
+						<h2>Ingreso Camiones</h2>
 					</div>
 					<table>
 						<thead>
@@ -139,16 +161,16 @@
 						</thead>
 						<tbody>
 							<tr>
-								<td><?php if($assoc_descarga['escaneo'] != NULL){ echo $assoc_descarga['escaneo']; } ?></td>
-								<td><?php if($assoc_descarga['fecha'] != NULL){ echo $assoc_descarga['fecha']; } ?></td>
-								<td><?php if($assoc_descarga['manifiesto'] != NULL){ echo $assoc_descarga['manifiesto']; } ?></td>
-								<td><?php if($assoc_descarga['rutaingres'] != NULL){ echo $assoc_descarga['rutaingres']; } ?></td>
-								<td><?php if($assoc_descarga['responsabl'] != NULL){ echo $assoc_descarga['responsabl']; } ?></td>
+								<td><?php if($assoc_descarga['escaneo'] != NULL){ echo htmlspecialchars($assoc_descarga['escaneo']); } ?></td>
+								<td><?php if($assoc_descarga['fecha'] != NULL){ echo htmlspecialchars($assoc_descarga['fecha']); } ?></td>
+								<td><?php if($assoc_descarga['manifiesto'] != NULL){ echo htmlspecialchars($assoc_descarga['manifiesto']); } ?></td>
+								<td><?php if($assoc_descarga['rutaingres'] != NULL){ echo htmlspecialchars($assoc_descarga['rutaingres']); } ?></td>
+								<td><?php if($assoc_descarga['responsabl'] != NULL){ echo htmlspecialchars($assoc_descarga['responsabl']); } ?></td>
 							</tr>
 						</tbody>
 					</table>
 					<div class="cardHeader">
-						<h2>Carga Camiones</h2>
+						<h2>Salida Camiones</h2>
 					</div>
 					<table>
 						<thead>
@@ -156,17 +178,46 @@
 								<td>No. Guía</td>
 								<td>Fecha</td>
 								<td>Manifiesto</td>
+								<td>Ruta Destino</td>
+								<td>Responsable</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><?php if($assoc_carga['escaneo'] != NULL){ echo htmlspecialchars($assoc_carga['escaneo']); } ?></td>
+								<td><?php if($assoc_carga['fecha'] != NULL){ echo htmlspecialchars($assoc_carga['fecha']); } ?></td>
+								<td><?php if($assoc_carga['manifiesto'] != NULL){ echo htmlspecialchars($assoc_carga['manifiesto']); } ?></td>
+								<td><?php if($assoc_carga['rutadestin'] != NULL){ echo htmlspecialchars($assoc_carga['rutadestin']); } ?></td>
+								<td><?php if($assoc_carga['responsabl'] != NULL){ echo htmlspecialchars($assoc_carga['responsabl']); } ?></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="cardHeader">
+						<h2>Envios</h2>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<td>No. Guía</td>
+								<td>Fecha</td>
+								<td>Fecha Recibe</td>
+								<td>Fecha Pago</td>
+								<td>Manifiesto</td>
+								<td>Ruta Destino</td>
 								<td>Ruta Ingreso</td>
 								<td>Responsable</td>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td><?php if($assoc_carga['escaneo'] != NULL){ echo $assoc_carga['escaneo']; } ?></td>
-								<td><?php if($assoc_carga['fecha'] != NULL){ echo $assoc_carga['fecha']; } ?></td>
-								<td><?php if($assoc_carga['manifiesto'] != NULL){ echo $assoc_carga['manifiesto']; } ?></td>
-								<td><?php if($assoc_carga['rutadestin'] != NULL){ echo $assoc_carga['rutadestin']; } ?></td>
-								<td><?php if($assoc_carga['responsabl'] != NULL){ echo $assoc_carga['responsabl']; } ?></td>
+								<td><?php if($assoc_envios['no_guia'] != NULL){ echo htmlspecialchars($assoc_envios['no_guia']); } ?></td>
+								<td><?php if($assoc_envios['fecha'] != NULL){ echo htmlspecialchars($assoc_envios['fecha']); } ?></td>
+								<td><?php if($assoc_envios['fecharecib'] != NULL){ echo htmlspecialchars($assoc_envios['fecharecib']); } ?></td>
+								<td><?php if($assoc_envios['fechapago'] != NULL){ echo htmlspecialchars($assoc_envios['fechapago']); } ?></td>
+								<td><?php if($assoc_envios['manifiesto'] != NULL){ echo htmlspecialchars($assoc_envios['manifiesto']); } ?></td>
+								<td><?php if($assoc_envios['destino'] != NULL){ echo htmlspecialchars($assoc_envios['destino']); } ?></td>
+								<td><?php if($assoc_envios['rutaingres'] != NULL){ echo htmlspecialchars($assoc_envios['rutaingres']); } ?></td>
+								<td><?php if($assoc_envios['responsabl'] != NULL){ echo htmlspecialchars($assoc_envios['responsabl']); } ?></td>
 							</tr>
 						</tbody>
 					</table>

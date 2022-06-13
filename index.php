@@ -99,6 +99,7 @@
 						<input type="submit" value="Login">
 					</div>
 				</form>
+				<p>Crear una nueva <a href="create.php">cuenta</a>.</p>
 			</div>
 		</div>
 	</section>
